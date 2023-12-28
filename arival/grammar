@@ -1,0 +1,37 @@
+Expression
+    = Prefix (Infix)*
+
+Prefix
+    = ParenthesizedExpression
+    | UnaryExpression
+    | FunctionExpression
+    | VarExpression
+    | NUMBER
+
+Infix
+    = ("+" / "-" / "*" / "/" / "^") Expression
+
+ParenthesizedExpression
+    = "(" Expression ")"
+
+FnArgExpression
+    = "(" Expression "," Expression ")"
+
+UnaryExpression
+    = "-" Expression
+
+FunctionExpression
+    = FUNCTION ParenthesizedExpression
+
+VarExpression
+    = IDENTIFIER
+
+NUMBER
+    = ^(?:\d+(?:\.\s*\d*)?)
+
+FUNCTION
+    = (log|max|min|sqrt|sin|cos|tan)
+
+IDENTIFIER
+    = ^[A-Za-z_][A-Za-z0-9_]*
+    
