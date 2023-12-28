@@ -1,5 +1,5 @@
 import unittest
-from arival.tokenizer import Tokenizer, TokenizerError
+from tokenizer import Tokenizer, TokenizerError
 
 class TestStatementTokenization(unittest.TestCase):
 

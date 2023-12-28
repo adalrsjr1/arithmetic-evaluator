@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from arival.prattparser import Parser, ParserError
+from prattparser import Parser, ParserError
 
 
 class TestStatementParser(unittest.TestCase):

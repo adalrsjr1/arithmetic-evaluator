@@ -1,9 +1,20 @@
 # Pratt Parser algorithm
-# Inspired by
+#
+# Inspired by:
 # https://inspirnathan.com/posts/164-pratt-parser-for-math-expressions-in-javascript/
+#
+# This version:
+#   - resolves any arbitray variable defined int the parser runtime
+#   - resolves more math functions as depicted in the `grammar` file
+#
+# The project is under MIT License
+#
+# Author: Adalberto R. Sampaio Jr (@adalrsjr1) [2023]
 
 import math
-from arival.tokenizer import Tokenizer, Token, TokenType
+
+from tokenizer import Token, Tokenizer, TokenType
+
 
 class ParserError(RuntimeError):
     def __init__(self, message):
@@ -11,6 +22,30 @@ class ParserError(RuntimeError):
 
 
 class Parser:
+    """
+    The parser implements the Pratt algorithm to evaluate math expressions.
+
+    To result arbitrary variables in the expression, the `Parser` class must be
+    initialized with the `runtime` argument (a dictionary mapping the variable
+    name and its assigned value).
+
+    To use the parser, pass the string of the math expression to the parse
+    function.
+
+    The Parse evaluates the following operations and math functions:
+        - basic operators: `+, -, *, /`
+        - power operator: `^`
+        - basic trig functions: `sin, cos, tan`
+        - power functions (same python signature): `log, sqrt, pow`
+        - `max, min`
+
+    Next is a valid example of math expression for this parser. Check the `test`
+    folder for more examples:
+        ```
+        5 * (sqrt(9) + sin(2 * 3.14)) - x / 2
+        # runtime{'x': 10}
+        ```
+    """
     def __init__(self, runtime: dict[str, float] = {}):
         self.runtime = runtime
 
@@ -31,8 +66,10 @@ class Parser:
         }
 
         result = self.expression()
+
         if self.tokenizer.has_more_tokens():
-            raise ParserError(f'parser cannot process the entire expression, error before pos [{self.tokenizer.cursor}], leftover: [{self.tokenizer.input_left_over()}]')
+            raise ParserError(f'parser cannot process the entire expression, error before pos [{self.tokenizer.cursor}]'
+                              f' leftover: [{self.tokenizer.input_left_over()}]')
         return result
 
     # expect a particular token, consume it, and move to the next token
@@ -40,7 +77,7 @@ class Parser:
         token = self.lookahead
 
         if token is None:
-            raise ParserError(f'unexpected end of input, expected {token_type}')
+            raise ParserError(f'unexpected end of input at pos [{self.tokenizer.cursor}], expected {token_type}')
 
         if token.type != token_type:
             raise ParserError(f'unexpected token: [{token.type}], expected [{token_type}]')
@@ -126,7 +163,6 @@ class Parser:
     def parenthesized_expression(self) -> any:
         self.consume(TokenType.PARENTHESIS_LEFT)
         expression = self.expression()
-
         self.consume(TokenType.PARENTHESIS_RIGHT)
         return expression
 
@@ -142,7 +178,6 @@ class Parser:
     #   = IDENTIFIER
     def var_expression(self) -> any:
         id = self.consume(TokenType.IDENTIFIER).value
-
         try:
             return self.runtime[id]
         except KeyError:
@@ -154,7 +189,6 @@ class Parser:
     ###
     def function_expression(self) -> any:
         id = self.consume(TokenType.FUNCTION).value
-        # expression = self.ParenthesizedExpression()
         expressions = self.fn_arg_expression()
         return self.fn(id, expressions)
 
@@ -175,6 +209,8 @@ class Parser:
         self.consume(TokenType.PARENTHESIS_RIGHT)
         return expressions
 
+    # when adding support to new methods, also edit the tokenizer
+    # function list
     def fn(self, id: str, value: list[str]):
         try:
             if id == 'sin':
@@ -197,8 +233,3 @@ class Parser:
                 raise ParserError(f'ivalid operation: {id}')
         except IndexError:
             raise ParserError(f'function [{id}] received wrong number of parameters [{len(value)}]')
-
-
-if __name__ == '__main__':
-    p = Parser()
-    print(p.parse('1 + 3) * 3'))

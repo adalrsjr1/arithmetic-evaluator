@@ -1,8 +1,11 @@
-from __future__ import annotations
+# The project is under MIT License
+#
+# Author: Adalberto R. Sampaio Jr (@adalrsjr1) [2023]
+
+import re
 from collections import namedtuple
 from enum import Enum
 
-import re
 
 class TokenType(str, Enum):
     NUMBER = 'NUMBER'
@@ -21,6 +24,8 @@ class TokenType(str, Enum):
         return self.name
 
 
+# add new function here to correctly capture it
+# also edit prattparser.fn method
 FUNCTION_LIST: list[str] = [
     'sin',
     'cos',
@@ -54,7 +59,6 @@ class TokenizerError(RuntimeError):
 
 
 Token = namedtuple('Token', 'type value')
-Token.is_function = lambda Token: Token.value in FUNCTION_LIST
 
 class Tokenizer:
     def __init__(self, input: str):
@@ -62,7 +66,6 @@ class Tokenizer:
         self.cursor: int = 0
 
     def __iter__(self):
-        # return Tokenizer(self.input)
         self.reset()
         return self
 

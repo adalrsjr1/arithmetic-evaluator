@@ -1,6 +1,6 @@
 import unittest
 from math import sin, cos, tan, log, sqrt, pow, pi, e
-from arival.prattparser import Parser
+from prattparser import Parser
 
 
 class TestArithmeticParser(unittest.TestCase):
@@ -37,6 +37,9 @@ class TestArithmeticParser(unittest.TestCase):
 
     def testPowerOperatorAndPowFunction(self):
         self.assertEqual(self.parse('2 ^ 3 + pow(4, 2)'), eval(compile('2 ** 3 + pow(4, 2)', '<string>', 'eval')))
+
+    def testSqrtPowerFunction(self):
+        self.assertEqual(self.parse('sqrt(pow(3,2))'), eval(compile('sqrt(pow(3,2))', '<string>', 'eval')))
 
 
     def test_mismatched_parentheses(self):
